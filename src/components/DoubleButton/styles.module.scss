@@ -1,0 +1,32 @@
+.button__container {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.5rem;
+  
+  &:disabled {
+    background-color: var(--green-light);
+  }
+
+  background-color: var(--red);
+  border: 0;
+  border-radius: 0.3rem;
+
+  color: var(--white-200);
+  font-weight: 600;
+  font-size: 0.8rem;
+
+  transition: background-color 0.5s;
+
+  &:focus {
+    background-color: var(--green);
+  }
+
+  // &:hover {
+
+  //   &:not(:disabled) {
+  //     background-color: var(--red-dark);
+  //   }
+  // }
+
+}

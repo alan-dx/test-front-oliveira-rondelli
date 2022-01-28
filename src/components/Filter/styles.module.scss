@@ -1,0 +1,72 @@
+.filter__container {
+  display: flex;
+  
+  padding-bottom: 0.5rem;
+ 
+  border-bottom: 1px solid var(--gray-100);
+  
+  &__input_box {
+
+    display: flex;
+    flex-direction: column;
+
+    &__input {
+      height: 2rem;
+      margin-right: 0.5rem;
+      width: 98%;
+
+      border: 1px solid var(--gray-100);
+      border-radius: 0.3rem;
+
+      padding: 0 0.5rem;
+      
+      color: var(--black);
+      
+      &:focus {
+        outline: 2px solid var(--blue);
+      }
+
+    }
+
+    &__label {
+      font-size: 0.7rem;
+      font-family: "Sora", sans-serif;
+      letter-spacing: 2px;
+      font-weight: 700;
+
+      margin-top: 0.2rem;
+      margin-left: 0.5rem;
+
+      color: var(--black);
+    }
+
+  }
+
+  &__checkboxs_box {
+    display: flex;
+    flex-direction: column;
+
+    &__checkbox {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+
+      gap: 0.3rem;
+
+      &:not(:first-child) {
+        margin-top: 0.2rem;
+      }
+
+      font-size: 0.7rem;
+      font-weight: 700;
+      font-family: "Sora", sans-serif;
+      color: var(--black);
+
+    }
+  }
+  
+  button {
+    max-height: 2rem;
+    margin-left: 0.4rem;
+  }
+}
