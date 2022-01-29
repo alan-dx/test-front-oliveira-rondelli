@@ -1,5 +1,5 @@
 import axios from 'axios';
 
 export const api = axios.create({
-  baseURL: process.env.API_URL
+  baseURL: "https://oliveira-rondelli-api.herokuapp.com/api/planogestor"
 })
