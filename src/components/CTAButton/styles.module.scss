@@ -25,4 +25,12 @@
       background-color: var(--red-dark);
     }
   }
+
+  &:disabled {
+    background-color: var(--blue-light);
+
+    &[data-redcolor="true"] {
+      background-color: var(--red-light);
+    }
+  }
 }

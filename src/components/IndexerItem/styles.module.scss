@@ -15,10 +15,16 @@
       gap: 0.5rem;
 
       button:first-child {
+        width: 2rem;
+        height: 2rem;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
         border: 0;
         border-radius: 0.2rem;
         background-color: var(--blue);
-        padding: 0.5rem;
 
         svg {
           color: #FFF;

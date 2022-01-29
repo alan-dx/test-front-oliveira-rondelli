@@ -15,7 +15,6 @@ export function DoubleButton({children = null, onClickConfirmMode, ...rest}: Squ
   const [isConfirmMode, setIsConfirmMode] = React.useState(false)
   const [isDeleting, setIsDeleting] = React.useState(false)
 
-
   function handleChangeMode() {
     
     if (isConfirmMode) {
@@ -29,10 +28,12 @@ export function DoubleButton({children = null, onClickConfirmMode, ...rest}: Squ
 
   return (
     <motion.button 
+      layout
       className={styles.button__container}
       onClick={() => handleChangeMode()}
+      data-mode={isConfirmMode && 'confirm'}
       whileTap={{
-        scale: 0.8
+        scale: 0.9
       }}
       disabled={isDeleting}
       {...rest}

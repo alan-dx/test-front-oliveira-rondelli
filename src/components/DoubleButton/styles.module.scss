@@ -1,8 +1,9 @@
 .button__container {
   display: flex;
   align-items: center;
-  gap: 0.2rem;
-  padding: 0.5rem;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
   
   &:disabled {
     background-color: var(--green-light);
@@ -18,7 +19,7 @@
 
   transition: background-color 0.5s;
 
-  &:focus {
+  &[data-mode="confirm"] {
     background-color: var(--green);
   }
 

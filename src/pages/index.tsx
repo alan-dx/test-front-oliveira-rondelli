@@ -6,16 +6,21 @@ import { FiPlus } from 'react-icons/fi';
 import styles from './home.module.scss';
 
 import { api } from '../services/api';;
+import { fetchIndexers } from '../utils/fetchIndexers';
 
 import { IndexDTO } from '../dtos/IndexDTO';
 import { CreateIndexData } from '../dtos/CreateIndexDTO';
+import { FilterDataDTO } from '../dtos/FilterDataDTO';
+import { EditIndexerDTO } from '../dtos/EditIndexerDTO';
 
 import { IndexerItem } from '../components/IndexerItem';
 import { CTAButton } from '../components/CTAButton';
 import { AddIndexerModal } from '../components/Modals/AddIndexerModal';
-import { fetchIndexers } from '../utils/fetchIndexers';
 import { Filter } from '../components/Filter';
-import { FilterDataDTO } from '../dtos/FilterDataDTO';
+import { EditIndexerModal } from '../components/Modals/EditIndexerModal';
+
+import { AnimateSharedLayout } from 'framer-motion';
+
 
 interface HomeProps {
   indexers: {
@@ -26,34 +31,35 @@ interface HomeProps {
 export default function Home({indexers}: HomeProps) {
 
   const [isAddIndexerModalOpen, setIsAddIndexerModalOpen] = React.useState(false)
+  const [isEditIndexerModalOpen, setIsEditIndexerModalOpen] = React.useState(false)
   const [indexersList, setIndexersList] = React.useState(indexers.data)
 
-  // const [simbolo, setSimbolo] = React.useState('')
-  // const [nome, setNome] = React.useState('')
-  // const [orderByDescending, setOrderByDescending] = React.useState(false)
-  // const [isFiltered, setIsFiltered] = React.useState(false)
+  const [layoutIdEditIndexerModal, setLayoutIdEditIndexerModal] = React.useState("")
+  const [editIndexerModalInitialData, setEditIndexerModalInitialData] = React.useState<IndexDTO>({} as IndexDTO)
 
   function handleCloseAddIndexerModal() {
     setIsAddIndexerModalOpen(false)
   }
 
-  function createNewIndexer({ simbolo, nome }: CreateIndexData) {
-    setIsAddIndexerModalOpen(false)
-    
-    api.post('/indexadores', {
-      simbolo,
-      nome
-    }).then((response) => {
-      return fetchIndexers({})
-    })
-    .then(response => {
-      const indexers = response.data
-      setIndexersList(indexers.data)
-    })
-    .catch(err => {
-      console.log(err)
+  async function createNewIndexer({ simbolo, nome }: CreateIndexData) {
+    try {
+      
+      await api.post('/indexadores', {
+        simbolo,
+        nome
+      })
+      setIsAddIndexerModalOpen(false)
+      await refetchIndexersList()
+
+    } catch (error) {
+      console.log(error)
       alert("Não foi possível criar um novo indexador. Tente novamente!")
-    })
+
+    }
+  }
+
+  function handleCloseEditIndexerModal() {
+    setIsEditIndexerModalOpen(false)
   }
 
   function fetchIndexersByFilter({
@@ -61,7 +67,6 @@ export default function Home({indexers}: HomeProps) {
     nome, 
     orderByDescending
   }: FilterDataDTO) {
-    console.log('asdas')
 
     fetchIndexers({
       nome,
@@ -88,34 +93,53 @@ export default function Home({indexers}: HomeProps) {
 
   }
 
-  // function handleClearFilter() {
-  //   setSimbolo('')
-  //   setNome('')
-  //   setOrderByDescending(false)
+  async function refetchIndexersList() {
+    //create as async to works better with react-final-form
+    await fetchIndexers({})
+      .then(response => {
+        const indexers = response.data
+        setIndexersList(indexers.data)
+      })
+  }
 
-  //   fetchIndexers({})
-  //   .then(response => {
-  //     const indexers = response.data
-  //     setIndexersList(indexers.data)
-  //     setIsFiltered(false)
-  //   })
-  // }
+  function handleOpenEditModal(id: number) {
+    setEditIndexerModalInitialData(indexersList.find(indexer => indexer.id == id))
+    setLayoutIdEditIndexerModal(`modal-edit-indexer${id}`)
+    
+    setIsEditIndexerModalOpen(true)
+  }
 
-  function refetchIndexersList() {
-    fetchIndexers({})
-    .then(response => {
-      const indexers = response.data
-      setIndexersList(indexers.data)
-    })
+  async function editIndexer({nome, simbolo, id}: EditIndexerDTO) {
+    try {
+
+      await api.patch(`/indexadores/${id}`, {
+        simbolo,
+        nome
+      })
+
+      setIsEditIndexerModalOpen(false)
+
+      await refetchIndexersList()
+    } catch (error) {
+      console.log(error)
+      alert("Não foi possível editar o Indexador. Tente novamente!")
+    }
   }
   
   return (
-    <>
+    <AnimateSharedLayout>
       <AddIndexerModal 
-        closeModal={handleCloseAddIndexerModal} 
-        isOpen={isAddIndexerModalOpen} 
-        layoutId='modal-add-indexer'
-        createNewIndexer={createNewIndexer} 
+          closeModal={handleCloseAddIndexerModal} 
+          isOpen={isAddIndexerModalOpen}
+          layoutId='modal-add-indexer'
+          createNewIndexer={createNewIndexer} 
+        />
+      <EditIndexerModal 
+        closeModal={handleCloseEditIndexerModal}
+        isOpen={isEditIndexerModalOpen}
+        layoutId={layoutIdEditIndexerModal}
+        editIndexer={editIndexer}
+        initialData={editIndexerModalInitialData}
       />
       <div className={styles.main__container}>
         <h1 className={styles.main__container__module_title}>
@@ -155,11 +179,14 @@ export default function Home({indexers}: HomeProps) {
             <tbody>
               {
                 indexersList.map(indexer => {
+
                   return (
                     <IndexerItem
                       key={indexer.id}
                       indexer={indexer} 
                       deleteIndexer={deleteIndexer}
+                      layoutId={`modal-edit-indexer${indexer.id}`}
+                      openEditModal={handleOpenEditModal}
                     />
                   )
                 })
@@ -168,7 +195,7 @@ export default function Home({indexers}: HomeProps) {
           </table>
         </div>
       </div>
-    </>
+    </AnimateSharedLayout>
   )
 }
 

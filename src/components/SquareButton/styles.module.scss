@@ -1,8 +1,8 @@
 .button__container {
   display: flex;
   align-items: center;
-  gap: 0.2rem;
-  padding: 0.7rem;
+  justify-content: center;
+  width: 2rem;
   
   &[data-redcolor="true"] {
     background-color: var(--red);

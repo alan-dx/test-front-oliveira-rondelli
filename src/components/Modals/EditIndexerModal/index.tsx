@@ -1,23 +1,53 @@
-import React, { FormEvent } from 'react';
+import React from 'react';
 import styles from './styles.module.scss';
 
 import { CreateIndexData } from '../../../dtos/CreateIndexDTO';
+import { IndexDTO } from '../../../dtos/IndexDTO';
 import { CTAButton } from '../../CTAButton';
 
 import { Form, Field } from 'react-final-form';
 import { AnimatePresence, motion } from 'framer-motion';
-import { FiPlus } from 'react-icons/fi';
+import { FiEdit } from 'react-icons/fi';
 
-interface AddIndexerModal {
+import { api } from '../../../services/api';
+import { EditIndexerDTO } from '../../../dtos/EditIndexerDTO';
+
+interface EditIndexerModalProps {
   isOpen: boolean;
   layoutId: string;
   closeModal: () => void;
-  createNewIndexer: ({simbolo, nome}: CreateIndexData) => Promise<void>;
+  editIndexer: ({simbolo, nome}: EditIndexerDTO) => Promise<void>;
+  initialData: IndexDTO;
 }
 
 type FormData = CreateIndexData
 
-export function AddIndexerModal({isOpen, layoutId, closeModal, createNewIndexer}: AddIndexerModal) {
+export function EditIndexerModal({isOpen, layoutId, closeModal, editIndexer, initialData}: EditIndexerModalProps) {
+
+  const [intialIndexerData, setInitialIndexerData] = React.useState(null)
+
+  const firstRender = React.useRef(true)
+
+  React.useEffect(() => {
+    if (firstRender.current) {//componentDidUpdate
+
+      firstRender.current = false
+      return
+      
+    } else if (isOpen) {
+
+      api.get(`/indexadores/${initialData.id}`).then(response => {
+        const { data: indexers } = response.data
+        setInitialIndexerData(indexers)
+      })
+
+    }
+
+    return () => {//clean garbage at initialIndexerData, removing old state
+      setInitialIndexerData(null)
+    }
+
+  }, [isOpen])
 
   const formValidate = (values: any) => {
     const errors: FormData = {} as FormData
@@ -34,11 +64,9 @@ export function AddIndexerModal({isOpen, layoutId, closeModal, createNewIndexer}
 
   }
 
-  async function handleCreateNewIndexer(values: FormData) {
+  async function handleEditIndexer(values: FormData) {
     const { nome, simbolo } = values
-
-    await createNewIndexer({nome, simbolo})
-
+    await editIndexer({nome, simbolo, id: intialIndexerData.id})
   }
 
   return (
@@ -75,15 +103,22 @@ export function AddIndexerModal({isOpen, layoutId, closeModal, createNewIndexer}
                 <h1 
                   className={styles.modal_content_container__content__header__title}
                 >
-                  CRIAR NOVO INDEXADOR
+                  EDITAR INDEXADOR
                 </h1>
                 <i className={styles.modal_content_container__content__header__icon} >
-                  <FiPlus />
+                  <FiEdit />
                 </i>
               </div>
               <Form 
-                onSubmit={handleCreateNewIndexer}
+                onSubmit={handleEditIndexer}
                 validate={formValidate}
+                initialValues={intialIndexerData ? {
+                  nome: intialIndexerData.nome,
+                  simbolo: intialIndexerData.simbolo
+                } : {
+                  nome: initialData.nome,
+                  simbolo: initialData.simbolo
+                }}
                 render={({ handleSubmit, submitting }) => (
                   <form 
                     className={styles.modal_content_container__content__main} 
@@ -98,8 +133,6 @@ export function AddIndexerModal({isOpen, layoutId, closeModal, createNewIndexer}
                               className={styles.modal_content_container__content__main__inputs__input_box__input}
                               data-error={(meta.error && meta.touched) && 'error'}
                               type="text"
-                              // value={simbolo}
-                              // onChange={e => setSimbolo(e.target.value)}
                               id="simbolo"
                               animate={
                                 (meta.error && meta.touched) && {
@@ -125,8 +158,6 @@ export function AddIndexerModal({isOpen, layoutId, closeModal, createNewIndexer}
                               className={styles.modal_content_container__content__main__inputs__input_box__input}
                               data-error={(meta.error && meta.touched) && 'error'}
                               type="text" 
-                              // value={nome} 
-                              // onChange={e => setNome(e.target.value)}
                               id="nome"
                               animate={
                                 (meta.error && meta.touched) && {
@@ -148,7 +179,7 @@ export function AddIndexerModal({isOpen, layoutId, closeModal, createNewIndexer}
 
                     <div className={styles.modal_content_container__content__main__footer} >
                       <CTAButton type='button' disabled={submitting} onClick={() => closeModal()} redColor text="Cancelar" />
-                      <CTAButton type='submit' disabled={submitting} text="Criar" />
+                      <CTAButton type='submit' disabled={submitting} text="Salvar" />
                     </div>
                   </form>
                 )}

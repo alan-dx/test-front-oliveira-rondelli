@@ -7,10 +7,9 @@ import { CTAButton } from '../CTAButton';
 import { SquareButton } from '../SquareButton';
 
 import { FilterDataDTO } from '../../dtos/FilterDataDTO';
-import { DoubleButton } from '../DoubleButton';
 
 interface FilterProps {
-  clearFilter: () => void;
+  clearFilter: () => Promise<void>;
   fetchIndexersByFilter: (filterData: FilterDataDTO) => void;
 }
 
@@ -70,22 +69,22 @@ export function Filter({ clearFilter, fetchIndexersByFilter }: FilterProps) {
       <div className={styles.filter__container__checkboxs_box} >
         <div className={styles.filter__container__checkboxs_box__checkbox} >
           <input
-            // className={styles.filter__container__input_box__input}
             type="radio" 
             id="antigos"
             name="order"
-            onChange={e => setOrderByDescending(false)}
+            onClick={e => setOrderByDescending(false)}
+            onChange={() => {}}//avoid input radio warning 
             checked={!orderByDescending}
           />
           <label htmlFor="antigos">MAIS ANTIGOS</label>
         </div>
         <div className={styles.filter__container__checkboxs_box__checkbox} >
           <input
-            // className={styles.filter__container__input_box__input}
             type="radio" 
             id="recentes"
             name="order"
-            onChange={e => setOrderByDescending(true)}
+            onChange={() => {}}//avoid input radio warning 
+            onClick={e => setOrderByDescending(true)}
           />
           <label htmlFor="recentes">MAIS RECENTES</label>
         </div>
@@ -98,7 +97,7 @@ export function Filter({ clearFilter, fetchIndexersByFilter }: FilterProps) {
         redColor
         disabled={!isFiltered}
       >
-        <RiFilterOffLine onClick={handleClearFilter} size={18} />
+        <RiFilterOffLine onClick={() => handleClearFilter()} size={18} />
       </SquareButton>
     </div>
   )

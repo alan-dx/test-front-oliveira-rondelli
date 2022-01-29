@@ -1,7 +1,9 @@
 import styles from './styles.module.scss';
 
-import { IndexDTO } from '../../dtos/IndexDTO';
+import { motion } from 'framer-motion';
 import { FiTrash, FiEdit } from 'react-icons/fi';
+
+import { IndexDTO } from '../../dtos/IndexDTO';
 
 import { format } from 'date-fns';
 import { DoubleButton } from '../DoubleButton';
@@ -9,16 +11,18 @@ import { DoubleButton } from '../DoubleButton';
 interface IndexerItemProps {
   indexer: IndexDTO;
   deleteIndexer: (id: number) => void;
+  layoutId: string;
+  openEditModal: (id: number) => void;
 }
 
-export function IndexerItem({indexer, deleteIndexer}: IndexerItemProps) {
+export function IndexerItem({ indexer, deleteIndexer, layoutId, openEditModal }: IndexerItemProps) {
 
   function handleDeleteIndexer(id: number) {
     deleteIndexer(id)
   }
 
   return (
-    <tr className={styles.indexer__container} >
+    <motion.tr layout className={styles.indexer__container} >
       <td>{indexer.simbolo}</td>
       <td>{indexer.nome}</td>
       <td>
@@ -27,13 +31,17 @@ export function IndexerItem({indexer, deleteIndexer}: IndexerItemProps) {
         }
       </td>
       <td>
-        <button>
+        <motion.button               
+          layout 
+          layoutId={layoutId}
+          onClick={() => openEditModal(indexer.id)}
+        >
           <FiEdit size={15} />
-        </button>
+        </motion.button>
         <DoubleButton onClickConfirmMode={() => handleDeleteIndexer(indexer.id)}>
           <FiTrash size={15} />
         </DoubleButton>
       </td>
-    </tr>
+    </motion.tr>
   )
 }
