@@ -18,10 +18,10 @@ import { CTAButton } from '../components/CTAButton';
 import { AddIndexerModal } from '../components/Modals/AddIndexerModal';
 import { Filter } from '../components/Filter';
 import { EditIndexerModal } from '../components/Modals/EditIndexerModal';
-
-import { AnimateSharedLayout } from 'framer-motion';
 import { PagesList } from '../components/PageSelector/PagesList';
 
+import { AnimateSharedLayout } from 'framer-motion';
+import { TailSpin } from 'react-loader-spinner';
 
 interface HomeProps {
   indexers: {
@@ -35,6 +35,8 @@ export default function Home({indexers, numberOfPages}: HomeProps) {
   const [isAddIndexerModalOpen, setIsAddIndexerModalOpen] = React.useState(false)
   const [isEditIndexerModalOpen, setIsEditIndexerModalOpen] = React.useState(false)
   const [indexersList, setIndexersList] = React.useState(indexers.data)
+  const [isFetching, setIsFetching] = React.useState(false)
+
 
   const [layoutIdEditIndexerModal, setLayoutIdEditIndexerModal] = React.useState("")
   const [editIndexerModalInitialData, setEditIndexerModalInitialData] = React.useState<IndexDTO>({} as IndexDTO)
@@ -43,6 +45,7 @@ export default function Home({indexers, numberOfPages}: HomeProps) {
 
   const [pagesNumber, setPagesNumber] = React.useState(numberOfPages)
   const [currentPage, setCurrentPage] = React.useState(1)
+
 
   function handleCloseAddIndexerModal() {
     setIsAddIndexerModalOpen(false)
@@ -146,6 +149,7 @@ export default function Home({indexers, numberOfPages}: HomeProps) {
 
   async function refetchIndexersList(params: FetchIndexersParams) {
     //create as async to works better with react-final-form
+    setIsFetching(true)
     await fetchIndexers(params)
     .then(response => {
       const indexers = response.data
@@ -153,9 +157,11 @@ export default function Home({indexers, numberOfPages}: HomeProps) {
       const pages = Math.ceil(Number(response.headers['x-total-count'])/10)
       setPagesNumber(pages)
     })
+    .finally(() => {
+      setIsFetching(false)
+    })
   }
 
-  
   return (
     <AnimateSharedLayout>
       <AddIndexerModal 
@@ -179,6 +185,11 @@ export default function Home({indexers, numberOfPages}: HomeProps) {
           <div className={styles.main__container__indexers_box__header}>
             <h1 className={styles.main__container__indexers_box__header__title}>
               Indexadores
+              {
+                isFetching && (
+                  <TailSpin color="#0F9AFE" height={25} width={25} ariaLabel='Carregando' />
+                )
+              }
             </h1>
             <CTAButton 
               layout 

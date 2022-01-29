@@ -31,16 +31,18 @@ export function IndexerItem({ indexer, deleteIndexer, layoutId, openEditModal }:
         }
       </td>
       <td>
-        <motion.button               
-          layout 
-          layoutId={layoutId}
-          onClick={() => openEditModal(indexer.id)}
-        >
-          <FiEdit size={15} />
-        </motion.button>
-        <DoubleButton onClickConfirmMode={() => handleDeleteIndexer(indexer.id)}>
-          <FiTrash size={15} />
-        </DoubleButton>
+        <div>
+          <motion.button               
+            layout 
+            layoutId={layoutId}
+            onClick={() => openEditModal(indexer.id)}
+          >
+            <FiEdit size={15} />
+          </motion.button>
+          <DoubleButton onClickConfirmMode={() => handleDeleteIndexer(indexer.id)}>
+            <FiTrash size={15} />
+          </DoubleButton>
+        </div>
       </td>
     </motion.tr>
   )
