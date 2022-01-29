@@ -20,15 +20,17 @@ import { Filter } from '../components/Filter';
 import { EditIndexerModal } from '../components/Modals/EditIndexerModal';
 
 import { AnimateSharedLayout } from 'framer-motion';
+import { PagesList } from '../components/PageSelector/PagesList';
 
 
 interface HomeProps {
   indexers: {
     data: IndexDTO[]
-  }
+  },
+  numberOfPages: number
 }
 
-export default function Home({indexers}: HomeProps) {
+export default function Home({indexers, numberOfPages}: HomeProps) {
 
   const [isAddIndexerModalOpen, setIsAddIndexerModalOpen] = React.useState(false)
   const [isEditIndexerModalOpen, setIsEditIndexerModalOpen] = React.useState(false)
@@ -38,6 +40,9 @@ export default function Home({indexers}: HomeProps) {
   const [editIndexerModalInitialData, setEditIndexerModalInitialData] = React.useState<IndexDTO>({} as IndexDTO)
 
   const [filterData, setFilterData] = React.useState<FetchIndexersParams>(null)
+
+  const [pagesNumber, setPagesNumber] = React.useState(numberOfPages)
+  const [currentPage, setCurrentPage] = React.useState(1)
 
   function handleCloseAddIndexerModal() {
     setIsAddIndexerModalOpen(false)
@@ -51,7 +56,7 @@ export default function Home({indexers}: HomeProps) {
         nome
       })
       setIsAddIndexerModalOpen(false)
-      await refetchIndexersList(filterData ? filterData : {})
+      await refetchIndexersList(filterData ? {...filterData, page: currentPage} : {page: currentPage})
 
     } catch (error) {
       console.log(error)
@@ -72,17 +77,14 @@ export default function Home({indexers}: HomeProps) {
 
     try {
       orderByDescending = orderByDescending == "new" ? true : false
-      
+      1
       setFilterData({simbolo, nome, orderByDescending})
+      setCurrentPage(1)
       
-      await fetchIndexers({
+      await refetchIndexersList({
         nome,
         simbolo,
-        orderByDescending
-      })
-      .then(response => {
-        const indexers = response.data
-          setIndexersList(indexers.data)
+        orderByDescending,
       })
 
     } catch (error) {
@@ -98,7 +100,7 @@ export default function Home({indexers}: HomeProps) {
     .then(response => {
       const newIndexersList = indexersList.filter(indexer => id !== indexer.id)
       setIndexersList(newIndexersList)
-      refetchIndexersList(filterData ? filterData : {})
+      refetchIndexersList(filterData ? {...filterData, page: currentPage} : {page: currentPage})
     }).catch(err => {
       console.error(err)
       alert("Não foi possível deletar esse indexador. Tente novamente!")
@@ -123,7 +125,7 @@ export default function Home({indexers}: HomeProps) {
 
       setIsEditIndexerModalOpen(false)
 
-      await refetchIndexersList(filterData ? filterData : {})
+      await refetchIndexersList(filterData ? {...filterData, page: currentPage} : {page: currentPage})
     } catch (error) {
       console.log(error)
       alert("Não foi possível editar o Indexador. Tente novamente!")
@@ -132,7 +134,14 @@ export default function Home({indexers}: HomeProps) {
 
   async function clearFilter() {
     setFilterData(null)
+    setCurrentPage(1)
+
     await refetchIndexersList({})
+  }
+
+  async function changePagination(page: number) {
+    setCurrentPage(page)
+    refetchIndexersList(filterData ? {...filterData, page} : {page})
   }
 
   async function refetchIndexersList(params: FetchIndexersParams) {
@@ -141,6 +150,8 @@ export default function Home({indexers}: HomeProps) {
     .then(response => {
       const indexers = response.data
       setIndexersList(indexers.data)
+      const pages = Math.ceil(Number(response.headers['x-total-count'])/10)
+      setPagesNumber(pages)
     })
   }
 
@@ -212,6 +223,15 @@ export default function Home({indexers}: HomeProps) {
               }
             </tbody>
           </table>
+          {
+            indexersList && (
+              <PagesList
+                numberOfPages={pagesNumber} 
+                currentPage={currentPage}
+                changePagination={changePagination}
+              />
+            )
+          }
         </div>
       </div>
     </AnimateSharedLayout>
@@ -220,11 +240,15 @@ export default function Home({indexers}: HomeProps) {
 
 export const getServerSideProps: GetServerSideProps = async (ctx: GetServerSidePropsContext) => {
 
-  const {data: indexers} = await api.get('/indexadores')
+  const response = await api.get('/indexadores')
+
+  const indexers = response.data
+  const numberOfPages = Math.ceil(Number(response.headers['x-total-count'])/10)
 
   return {
     props: {
-      indexers
+      indexers,
+      numberOfPages
     }
   }
 }

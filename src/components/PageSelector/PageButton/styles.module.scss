@@ -1,0 +1,27 @@
+.page_button__container {
+  width: 2rem;
+  height: 2rem;
+
+  background-color: var(--gray-100);
+  border: 0;
+  border-radius: 0.3rem;
+
+  color: var(--black);
+  font-weight: 600;
+  font-size: 0.8rem;
+  
+  transition: background-color 0.5s;
+
+  &:hover {
+    background-color: var(--gray);
+  }
+
+  &[data-active="true"] {
+    background-color: var(--red);
+    color: var(--white);
+
+    &:hover {
+      background-color: var(--red-dark);
+    }
+  }
+}
