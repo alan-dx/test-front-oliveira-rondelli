@@ -1,5 +1,5 @@
 export interface FilterDataDTO {
   simbolo: string;
   nome: string;
-  orderByDescending: boolean;
+  orderByDescending: "old" | "new" | boolean;
 }

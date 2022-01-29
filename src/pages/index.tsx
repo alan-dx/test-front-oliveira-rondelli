@@ -6,7 +6,7 @@ import { FiPlus } from 'react-icons/fi';
 import styles from './home.module.scss';
 
 import { api } from '../services/api';;
-import { fetchIndexers } from '../utils/fetchIndexers';
+import { fetchIndexers, FetchIndexersParams } from '../utils/fetchIndexers';
 
 import { IndexDTO } from '../dtos/IndexDTO';
 import { CreateIndexData } from '../dtos/CreateIndexDTO';
@@ -37,6 +37,8 @@ export default function Home({indexers}: HomeProps) {
   const [layoutIdEditIndexerModal, setLayoutIdEditIndexerModal] = React.useState("")
   const [editIndexerModalInitialData, setEditIndexerModalInitialData] = React.useState<IndexDTO>({} as IndexDTO)
 
+  const [filterData, setFilterData] = React.useState<FetchIndexersParams>(null)
+
   function handleCloseAddIndexerModal() {
     setIsAddIndexerModalOpen(false)
   }
@@ -49,7 +51,7 @@ export default function Home({indexers}: HomeProps) {
         nome
       })
       setIsAddIndexerModalOpen(false)
-      await refetchIndexersList()
+      await refetchIndexersList(filterData ? filterData : {})
 
     } catch (error) {
       console.log(error)
@@ -62,22 +64,33 @@ export default function Home({indexers}: HomeProps) {
     setIsEditIndexerModalOpen(false)
   }
 
-  function fetchIndexersByFilter({
+  async function fetchIndexersByFilter({
     simbolo, 
     nome, 
     orderByDescending
   }: FilterDataDTO) {
 
-    fetchIndexers({
-      nome,
-      simbolo,
-      orderByDescending
-    })
-    .then(response => {
-      const indexers = response.data
+    try {
+      orderByDescending = orderByDescending == "new" ? true : false
+      
+      setFilterData({simbolo, nome, orderByDescending})
+      
+      await fetchIndexers({
+        nome,
+        simbolo,
+        orderByDescending
+      })
+      .then(response => {
+        const indexers = response.data
+          setIndexersList(indexers.data)
+      })
 
-      setIndexersList(indexers.data)
-    })
+    } catch (error) {
+      console.log(error)
+      alert("Não foi possível realizar a busca, verifique os campos e tente novamente!")
+    }
+
+
   }
 
   function deleteIndexer(id: number) {
@@ -85,21 +98,12 @@ export default function Home({indexers}: HomeProps) {
     .then(response => {
       const newIndexersList = indexersList.filter(indexer => id !== indexer.id)
       setIndexersList(newIndexersList)
-      refetchIndexersList()
+      refetchIndexersList(filterData ? filterData : {})
     }).catch(err => {
       console.error(err)
       alert("Não foi possível deletar esse indexador. Tente novamente!")
     })
 
-  }
-
-  async function refetchIndexersList() {
-    //create as async to works better with react-final-form
-    await fetchIndexers({})
-      .then(response => {
-        const indexers = response.data
-        setIndexersList(indexers.data)
-      })
   }
 
   function handleOpenEditModal(id: number) {
@@ -119,12 +123,27 @@ export default function Home({indexers}: HomeProps) {
 
       setIsEditIndexerModalOpen(false)
 
-      await refetchIndexersList()
+      await refetchIndexersList(filterData ? filterData : {})
     } catch (error) {
       console.log(error)
       alert("Não foi possível editar o Indexador. Tente novamente!")
     }
   }
+
+  async function clearFilter() {
+    setFilterData(null)
+    await refetchIndexersList({})
+  }
+
+  async function refetchIndexersList(params: FetchIndexersParams) {
+    //create as async to works better with react-final-form
+    await fetchIndexers(params)
+    .then(response => {
+      const indexers = response.data
+      setIndexersList(indexers.data)
+    })
+  }
+
   
   return (
     <AnimateSharedLayout>
@@ -159,7 +178,7 @@ export default function Home({indexers}: HomeProps) {
             />
           </div>
           <Filter
-            clearFilter={refetchIndexersList} 
+            clearFilter={clearFilter} 
             fetchIndexersByFilter={fetchIndexersByFilter}
           />
           <table className={styles.main__container__indexers_box__table}>
