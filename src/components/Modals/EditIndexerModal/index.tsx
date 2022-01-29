@@ -106,7 +106,7 @@ export function EditIndexerModal({isOpen, layoutId, closeModal, editIndexer, ini
                   EDITAR INDEXADOR
                 </h1>
                 <i className={styles.modal_content_container__content__header__icon} >
-                  <FiEdit />
+                  <FiEdit size={14} />
                 </i>
               </div>
               <Form 
