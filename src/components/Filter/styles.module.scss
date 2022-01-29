@@ -12,14 +12,18 @@
 
     &__input {
       height: 2rem;
-      margin-right: 0.5rem;
       width: 98%;
+      
+      margin-right: 0.5rem;
+      padding: 0 0.5rem;
+
 
       border: 1px solid var(--gray-100);
       border-radius: 0.3rem;
-
       
       color: var(--black);
+      font-weight: 500;
+      font-size: 0.9rem;
       
       &:focus {
         outline: 2px solid var(--blue);

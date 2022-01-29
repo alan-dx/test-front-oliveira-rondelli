@@ -62,6 +62,16 @@
       }
 
     }
+
+    &__not_found {
+      font-size: 1rem;
+      text-align: center;
+      margin-top: 1rem;
+
+      font-family: "Sora", sans-serif;
+
+      color: var(--black);
+    }
   }
 
 }

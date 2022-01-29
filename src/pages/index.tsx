@@ -203,37 +203,42 @@ export default function Home({indexers, numberOfPages}: HomeProps) {
             clearFilter={clearFilter} 
             fetchIndexersByFilter={fetchIndexersByFilter}
           />
-          <table className={styles.main__container__indexers_box__table}>
-            <thead>
-              <tr>
-                <th>
-                  SÍMBOLO
-                </th>
-                <th>
-                  NOME
-                </th>
-                <th>
-                  DATA DE CADASTRO
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {
-                indexersList.map(indexer => {
-
-                  return (
-                    <IndexerItem
-                      key={indexer.id}
-                      indexer={indexer} 
-                      deleteIndexer={deleteIndexer}
-                      layoutId={`modal-edit-indexer${indexer.id}`}
-                      openEditModal={handleOpenEditModal}
-                    />
-                  )
-                })
-              }
-            </tbody>
-          </table>
+          {
+            indexersList[0] ? (
+              <table className={styles.main__container__indexers_box__table}>
+                <thead>
+                  <tr>
+                    <th>
+                      SÍMBOLO
+                    </th>
+                    <th>
+                      NOME
+                    </th>
+                    <th>
+                      DATA DE CADASTRO
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {
+                    indexersList.map(indexer => {
+                      return (
+                        <IndexerItem
+                          key={indexer.id}
+                          indexer={indexer} 
+                          deleteIndexer={deleteIndexer}
+                          layoutId={`modal-edit-indexer${indexer.id}`}
+                          openEditModal={handleOpenEditModal}
+                        />
+                      )
+                    })
+                  }
+                </tbody>
+              </table>
+            ) : (
+              <h1 className={styles.main__container__indexers_box__not_found} >Indexador não encontrado.</h1>
+            )
+          }
           {
             indexersList && (
               <PagesList
