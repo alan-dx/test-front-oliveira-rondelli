@@ -34,7 +34,7 @@ export function DoubleButton({children = null, onClickConfirmMode, ...rest}: Squ
 
     setTimeout(() => {
       setIsConfirmMode(false)
-    }, 2000)
+    }, 3000)
   }
 
   return (
