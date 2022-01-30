@@ -3,23 +3,37 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
 
-  margin: 2rem 0;
+  height: 100vh;
+
+  margin: auto;
 
   &__module_title {
+    display: flex;
+    flex-direction: column;
+
     font-family: "Sora", sans-serif;
     color: var(--black);
     letter-spacing: 5px;
-    font-size: 1.6rem;
+    font-size: 1.4rem;
 
     margin-bottom: 1rem;
+
+    &__company {
+      font-family: "Sora", sans-serif;
+      text-align: center;
+      color: var(--black);
+      letter-spacing: 5px;
+      font-size: 0.8rem;
+    }
   }
  
   &__indexers_box {
-    width: 100%;
+    width: 80%;
     max-width: 1170px;
-
-    padding: 1rem 1.5rem;
+    
+    padding: 1rem 1rem 0rem 1rem;
     margin: 0 auto;
     
     border-radius: 0.5rem;
@@ -31,7 +45,7 @@
       align-items: flex-start;
       justify-content: space-between;
       
-      padding-bottom: 0.5rem;
+      padding-bottom: 0.3rem;
       
       &__title {
         display: flex;

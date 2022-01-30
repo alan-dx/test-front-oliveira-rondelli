@@ -7,6 +7,7 @@ import { IndexDTO } from '../../dtos/IndexDTO';
 
 import { format } from 'date-fns';
 import { DoubleButton } from '../DoubleButton';
+import { SquareButton } from '../SquareButton';
 
 interface IndexerItemProps {
   indexer: IndexDTO;
@@ -23,8 +24,14 @@ export function IndexerItem({ indexer, deleteIndexer, layoutId, openEditModal }:
 
   return (
     <motion.tr layout className={styles.indexer__container} >
-      <td>{indexer.simbolo}</td>
-      <td>{indexer.nome}</td>
+      <td>
+        {indexer.nome.slice(0, 20)}
+        {indexer.nome.length > 20 ? "..." : ""}
+      </td>
+      <td>
+        {indexer.simbolo.slice(0, 10)}
+        {indexer.simbolo.length > 10 ? "..." : ""}
+      </td>
       <td>
         {
           format(new Date(indexer.dataCadastro), 'dd/MM/yyyy')
@@ -32,13 +39,13 @@ export function IndexerItem({ indexer, deleteIndexer, layoutId, openEditModal }:
       </td>
       <td>
         <div>
-          <motion.button               
+          <SquareButton
             layout 
             layoutId={layoutId}
             onClick={() => openEditModal(indexer.id)}
           >
             <FiEdit size={15} />
-          </motion.button>
+          </SquareButton>
           <DoubleButton onClickConfirmMode={() => handleDeleteIndexer(indexer.id)}>
             <FiTrash size={15} />
           </DoubleButton>

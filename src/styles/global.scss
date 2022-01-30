@@ -18,7 +18,7 @@
   --green: #00820f;
 
   --white: #FFFFFF;
-  --white-200: #EFF8FF;
+  --white-200: #F5F5F5;
 
   --gray: #6E7275;
   --gray-100: #DBDBDB; 
@@ -29,7 +29,7 @@
 }
 
 ::-webkit-scrollbar {
-  width: 5px;
+  height: 5px;
 
   &-track {
     border-radius: 10px;

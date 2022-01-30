@@ -175,11 +175,12 @@ export default function Home({indexers, numberOfPages}: HomeProps) {
         isOpen={isEditIndexerModalOpen}
         layoutId={layoutIdEditIndexerModal}
         editIndexer={editIndexer}
-        initialData={editIndexerModalInitialData}
+        initialData={editIndexerModalInitialData}       
       />
       <div className={styles.main__container}>
         <h1 className={styles.main__container__module_title}>
           PLANO GESTOR
+          <small className={styles.main__container__module_title__company}>Oliveira {"&"} Rondelli</small>
         </h1>
         <div className={styles.main__container__indexers_box}>
           <div className={styles.main__container__indexers_box__header}>
@@ -187,7 +188,7 @@ export default function Home({indexers, numberOfPages}: HomeProps) {
               Indexadores
               {
                 isFetching && (
-                  <TailSpin color="#0F9AFE" height={25} width={25} ariaLabel='Carregando' />
+                  <TailSpin color="#c70000" height={25} width={25} ariaLabel='Carregando' />
                 )
               }
             </h1>
@@ -209,10 +210,10 @@ export default function Home({indexers, numberOfPages}: HomeProps) {
                 <thead>
                   <tr>
                     <th>
-                      SÍMBOLO
+                      NOME
                     </th>
                     <th>
-                      NOME
+                      SÍMBOLO
                     </th>
                     <th>
                       DATA DE CADASTRO

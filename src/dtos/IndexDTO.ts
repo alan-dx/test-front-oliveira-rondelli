@@ -3,5 +3,5 @@ export interface IndexDTO {
   nome: string;
   id: number;
   dataCadastro: Date;
-  dataAleteracao: null | Date;
+  dataAlteracao: null | Date;
 }

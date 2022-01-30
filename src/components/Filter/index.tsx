@@ -31,8 +31,6 @@ export function Filter({ clearFilter, fetchIndexersByFilter }: FilterProps) {
     clearFilter()
   }
 
-  // const intialValues = (currentFilterData.nome != "" || currentFilterData.simbolo != "" ) 
-
   return (
     <Form 
       onSubmit={handleFetchIndexersByFilter}
@@ -44,26 +42,6 @@ export function Filter({ clearFilter, fetchIndexersByFilter }: FilterProps) {
       
       render={({handleSubmit, submitting, pristine, values, form}) => (
         <form onSubmit={handleSubmit} className={styles.filter__container} >
-          <Field name="simbolo">
-            {({ input, meta }) => (
-              <div className={styles.filter__container__input_box} >
-                <input
-                  {...input}
-                  className={styles.filter__container__input_box__input}
-                  type="text" 
-                  id='simbolo'
-                  // value={simbolo}
-                  // onChange={e => setSimbolo(e.target.value)}
-                />
-                <label
-                  className={styles.filter__container__input_box__label}
-                  htmlFor="simbolo"
-                >
-                  SÍMBOLO
-                </label>
-              </div>
-            )}
-          </Field>
           <Field name="nome">
             {({ input, meta }) => (
               <div className={styles.filter__container__input_box} >
@@ -84,6 +62,26 @@ export function Filter({ clearFilter, fetchIndexersByFilter }: FilterProps) {
               </div>
             )}
           </Field>
+          <Field name="simbolo">
+            {({ input, meta }) => (
+              <div className={styles.filter__container__input_box} >
+                <input
+                  {...input}
+                  className={styles.filter__container__input_box__input}
+                  type="text" 
+                  id='simbolo'
+                  // value={simbolo}
+                  // onChange={e => setSimbolo(e.target.value)}
+                />
+                <label
+                  className={styles.filter__container__input_box__label}
+                  htmlFor="simbolo"
+                >
+                  SÍMBOLO
+                </label>
+              </div>
+            )}
+          </Field>
           <div className={styles.filter__container__checkboxs_box} >
             <div className={styles.filter__container__checkboxs_box__checkbox} >
               <Field 
@@ -93,7 +91,7 @@ export function Filter({ clearFilter, fetchIndexersByFilter }: FilterProps) {
                 value="old"
                 id="antigos"
               />
-              <label htmlFor="antigos">MAIS ANTIGOS</label>
+              <label htmlFor="antigos">A - Z</label>
             </div>
             <div className={styles.filter__container__checkboxs_box__checkbox} >
               <Field 
@@ -103,7 +101,7 @@ export function Filter({ clearFilter, fetchIndexersByFilter }: FilterProps) {
                 value="new"
                 id="recentes"
               />
-              <label htmlFor="recentes">MAIS RECENTES</label>
+              <label htmlFor="recentes">Z - A</label>
             </div>
           </div>
           <CTAButton 

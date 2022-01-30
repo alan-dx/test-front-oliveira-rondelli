@@ -1,7 +1,8 @@
 import { ButtonHTMLAttributes, ReactNode } from 'react';
 import styles from './styles.module.scss';
+import { HTMLMotionProps, motion } from 'framer-motion';
 
-interface SquareButton extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface SquareButton extends HTMLMotionProps<"button"> {
   children: ReactNode;
   layoutId?: string;
   redColor?: boolean
@@ -9,12 +10,12 @@ interface SquareButton extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 export function SquareButton({children = null, redColor = false, ...rest}: SquareButton) {
   return (
-    <button 
+    <motion.button 
       className={styles.button__container}
       data-redcolor={redColor ? "true" : "false"}
       {...rest}
     >
       {children}
-    </button>
+    </motion.button>
   )
 }

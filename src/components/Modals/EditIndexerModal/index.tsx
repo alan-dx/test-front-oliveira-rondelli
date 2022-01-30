@@ -8,6 +8,7 @@ import { CTAButton } from '../../CTAButton';
 import { Form, Field } from 'react-final-form';
 import { AnimatePresence, motion } from 'framer-motion';
 import { FiEdit } from 'react-icons/fi';
+import { TailSpin } from 'react-loader-spinner';
 
 import { api } from '../../../services/api';
 import { EditIndexerDTO } from '../../../dtos/EditIndexerDTO';
@@ -25,6 +26,8 @@ type FormData = CreateIndexData
 export function EditIndexerModal({isOpen, layoutId, closeModal, editIndexer, initialData}: EditIndexerModalProps) {
 
   const [intialIndexerData, setInitialIndexerData] = React.useState(null)
+  const [isFetching, setIsFetching] = React.useState(false)
+
 
   const firstRender = React.useRef(true)
 
@@ -36,9 +39,13 @@ export function EditIndexerModal({isOpen, layoutId, closeModal, editIndexer, ini
       
     } else if (isOpen) {
 
+      setIsFetching(true)
+
       api.get(`/indexadores/${initialData.id}`).then(response => {
         const { data: indexers } = response.data
         setInitialIndexerData(indexers)
+      }).finally(() => {
+        setIsFetching(false)
       })
 
     }
@@ -70,7 +77,7 @@ export function EditIndexerModal({isOpen, layoutId, closeModal, editIndexer, ini
   }
 
   return (
-    <AnimatePresence>
+    <AnimatePresence >
       {
         isOpen && (
         <>
@@ -92,13 +99,13 @@ export function EditIndexerModal({isOpen, layoutId, closeModal, editIndexer, ini
           />
           <div className={styles.modal_content_container}>
             <motion.div 
-              layout 
-              layoutId={layoutId} 
               className={styles.modal_content_container__content}
+              layoutId={layoutId}
+              layout 
+              layoutDependency={isOpen}
             >
               <div 
                 className={styles.modal_content_container__content__header} 
-
               >
                 <h1 
                   className={styles.modal_content_container__content__header__title}
@@ -108,6 +115,11 @@ export function EditIndexerModal({isOpen, layoutId, closeModal, editIndexer, ini
                 <i className={styles.modal_content_container__content__header__icon} >
                   <FiEdit size={14} />
                 </i>
+                {
+                  isFetching && (
+                    <TailSpin color="#c70000" height={20} width={20} ariaLabel='Carregando' />
+                  )
+                }
               </div>
               <Form 
                 onSubmit={handleEditIndexer}

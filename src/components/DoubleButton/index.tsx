@@ -15,6 +15,13 @@ export function DoubleButton({children = null, onClickConfirmMode, ...rest}: Squ
   const [isConfirmMode, setIsConfirmMode] = React.useState(false)
   const [isDeleting, setIsDeleting] = React.useState(false)
 
+  React.useEffect(() => {
+
+    return () => {//cleanup
+      setIsConfirmMode(false)
+    }
+  }, [])
+
   function handleChangeMode() {
     
     if (isConfirmMode) {
@@ -24,6 +31,10 @@ export function DoubleButton({children = null, onClickConfirmMode, ...rest}: Squ
     }
 
     setIsConfirmMode(true)
+
+    setTimeout(() => {
+      setIsConfirmMode(false)
+    }, 2000)
   }
 
   return (

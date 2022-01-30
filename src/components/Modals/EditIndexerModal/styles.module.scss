@@ -8,10 +8,11 @@
 
   pointer-events: none;
   position: fixed;
+  
   z-index: 2;
 
-    &__content {
-      
+  &__content {
+    
     max-width: 600px;
     width: 100%;
     
@@ -43,13 +44,15 @@
       }
 
       &__icon {
+        width: 1.5rem;
+        height: 1.5rem;
+
         display: flex;
         align-items: center;
         justify-content: center;
+        margin-right: 0.5rem;
 
         background-color: var(--blue);
-        width: 1.5rem;
-        height: 1.5rem;
         border-radius: 0.2rem;
 
         svg {
