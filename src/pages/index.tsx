@@ -1,4 +1,5 @@
 import React from 'react';
+import Head from 'next/head';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 
 import { FiPlus } from 'react-icons/fi';
@@ -164,6 +165,9 @@ export default function Home({indexers, numberOfPages}: HomeProps) {
 
   return (
     <AnimateSharedLayout>
+      <Head>
+        <title>Plano Gestor | Oliveira {"&"} Rondelli</title>
+      </Head>
       <AddIndexerModal 
           closeModal={handleCloseAddIndexerModal} 
           isOpen={isAddIndexerModalOpen}
