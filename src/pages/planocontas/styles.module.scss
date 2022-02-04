@@ -1,0 +1,14 @@
+.challenge2__container {
+  height: 100vh;
+  background-color: #F5F5F5;
+
+  display: flex;
+  justify-content: center;
+
+  &__main {
+    flex: 1;
+    max-width: 1170px;
+    margin-top: 3rem;
+
+  }
+}
