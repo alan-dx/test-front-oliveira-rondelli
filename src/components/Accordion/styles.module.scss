@@ -22,9 +22,15 @@
 
       h1 {
         font-size: 1rem;
+
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+
+        gap: 0.5rem;
       }
 
-      span {
+      button {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -33,6 +39,7 @@
 
         border-radius: 50%;
         background-color: var(--gray-100);
+        border: 0;
         
         cursor: pointer;
 

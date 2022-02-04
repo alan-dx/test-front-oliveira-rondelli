@@ -7,46 +7,60 @@ import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { api } from '../../services/api';
 
 import { AccountPlanDTO } from '../../dtos/AccountPLanDTO';
+import { PagesList } from '../../components/PageSelector/PagesList';
 
-interface PlanoContasProps {
-  plans: {
-    data: AccountPlanDTO[]
-  } 
+type PlansData = {
+  data: AccountPlanDTO[]
 }
 
-export default function PlanoContas({ plans }: PlanoContasProps) {
+interface PlanoContasProps {
+  plans: PlansData,
+  numberOfPages: number
+}
+
+export function findChildrenOfPlans(id: number) {
+  // const son = plans.data.find(plan => plan.parentPlanoConta?.id === id)
+  // // console.log(son)
+  // getPlans()
+  // const son2 = plans.data.filter(plan => plan.parentPlanoConta?.id === id)
+
+  return api.get(`/planocontas?nivelSuperior=${id}`).then((response) => {
+    const plans = response.data.data.filter(plan => plan.parentPlanoConta?.id === id)
+    return plans
+  })
+
+  // if (son2) {
+  //   return son2.map((son) => (
+  //     <Accordion 
+  //       key={son.id}
+  //       title={`${son.id.toString().split("").join(".")} (${son.identificacao})`} 
+  //       findYourSon={() => findChildrenOfPlans(son.id)} 
+  //     />
+  //   )) 
+  // }
+
+  // return null
+}
+
+export default function PlanoContas({ plans, numberOfPages }: PlanoContasProps) {
   
   const [listOfFatherPlans, setListOfFatherPlans] = React.useState<AccountPlanDTO[]>(plans.data.filter(plan => plan.parentPlanoConta === null))
 
-  function findChildrenOfPlans(id: number) {
-    // const son = plans.data.find(plan => plan.parentPlanoConta?.id === id)
-    // // console.log(son)
-    // getPlans()
-    const son2 = plans.data.filter(plan => plan.parentPlanoConta?.id === id)
+  const [pagesNumber, setPagesNumber] = React.useState(numberOfPages)
+  const [currentPage, setCurrentPage] = React.useState(1)
 
-    // return api.get(`/planocontas?nivelSuperior=${id}`).then((response) => {
-    //   const plans = response.data.data.filter(plan => plan.parentPlanoConta?.id === id)
-    //   return plans
-    // })
-
-
-
-    if (son2) {
-      return son2.map((son) => (
-        <Accordion 
-          key={son.id}
-          title={`${son.id.toString().split("").join(".")} (${son.identificacao})`} 
-          findYourSon={() => findChildrenOfPlans(son.id)} 
-        />
-      )) 
+  async function changePagination(page: number) {
+    try {
+      setCurrentPage(page)
+      const response = await api.get(`/planocontas?page=${page}`)
+      const newPlans: PlansData = response.data
+      setPagesNumber(Math.ceil(Number(response.headers['x-total-count'])/10))
+      setListOfFatherPlans(newPlans.data.filter(plan => plan.parentPlanoConta === null))
+    } catch (error) {
+      console.log(error)
+      alert("Não foi possível realizar a paginação, tente novamente!")
     }
 
-    return null
-  }
-
-  async function getPlans() {
-    const response = await api.get('/planocontas')
-    console.log(response.data)
   }
 
   return (
@@ -63,6 +77,12 @@ export default function PlanoContas({ plans }: PlanoContasProps) {
               findYourSon={() => findChildrenOfPlans(plan.id)}
             />
           ))}
+
+          <PagesList
+            changePagination={changePagination}
+            numberOfPages={pagesNumber}
+            currentPage={currentPage} 
+          />
         </div>
       </div>
     </AnimateSharedLayout>
