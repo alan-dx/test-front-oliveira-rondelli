@@ -5,6 +5,7 @@ import { TailSpin } from 'react-loader-spinner';
 import styles from './styles.module.scss';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { api } from '../../services/api';
+import Head from 'next/head';
 
 import { AccountPlanDTO } from '../../dtos/AccountPLanDTO';
 import { FilterAccountPlansDataDTO } from '../../dtos/FilterAccountPlansDataDTO';
@@ -38,21 +39,28 @@ export default function PlanoContas({ plans, numberOfPages }: PlanoContasProps) 
 
   async function changePagination(page: number) {
     try {
+
       setIsFetching(true)
       setCurrentPage(page)
-      console.log(filterData)
+
       const response = await fetchPlans(filterData ? {...filterData, page} : {page})
       const newPlans: PlansData = response.data
 
       setPagesNumber(Math.ceil(Number(response.headers['x-total-count'])/10))
 
-      if (!filterData.identificacao) {
+      if (filterData) {
+        if (!filterData.identificacao) {
+          setListOfFatherPlans(
+            newPlans.data.filter(plan => plan.parentPlanoConta === null)
+          )
+        } else {
+          setListOfFatherPlans(newPlans.data)
+        } 
+      } else {
         setListOfFatherPlans(
           newPlans.data.filter(plan => plan.parentPlanoConta === null)
         )
-      } else {
-        setListOfFatherPlans(newPlans.data)
-      } 
+      }
 
       // setListOfFatherPlans(newPlans.data.filter(plan => plan.parentPlanoConta === null))
 
@@ -123,6 +131,9 @@ export default function PlanoContas({ plans, numberOfPages }: PlanoContasProps) 
 
   return (
     <AnimateSharedLayout>
+      <Head>
+        <title>Plano Gestor | Oliveira {"&"} Rondelli</title>
+      </Head>
       <div className={styles.account_plans__container}>
         <h1 className={styles.account_plans__container__module_title}>
           PLANO GESTOR
