@@ -81,7 +81,7 @@ export default function Home({indexers, numberOfPages}: HomeProps) {
 
     try {
       orderByDescending = orderByDescending == "new" ? true : false
-      1
+      
       setFilterData({simbolo, nome, orderByDescending})
       setCurrentPage(1)
       

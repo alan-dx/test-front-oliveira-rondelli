@@ -3,16 +3,19 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 import { FiChevronDown, FiChevronUp, FiCornerDownRight, FiCornerDownLeft } from 'react-icons/fi';
 import styles from './styles.module.scss';
-import { findChildrenOfPlans } from '../../pages/planocontas';
 import { TailSpin } from 'react-loader-spinner';
+import { format } from 'date-fns';
+
+import { findChildrenOfPlans } from '../../utils/findChildrensOfPlans';
+import { AccountPlanDTO } from '../../dtos/AccountPLanDTO';
 
 interface AccordionProps {
   children?: ReactNode;
-  title?: string;
+  plan: AccountPlanDTO;
   findYourSon?: () => any;
 }
 
-export function Accordion({ title = "Test", findYourSon }: AccordionProps) {
+export function Accordion({ plan, findYourSon }: AccordionProps) {
 
   const [isOpen, setIsOpen] = React.useState(false)
   const [hisSon, setHisSon] = React.useState(null)
@@ -20,7 +23,7 @@ export function Accordion({ title = "Test", findYourSon }: AccordionProps) {
   const [isFetching, setIsFetching] = React.useState(false)
 
   function toogleAccordion() {
-    
+
     setIsOpen(prev => !prev)
 
     if (!isOpen) {
@@ -30,7 +33,7 @@ export function Accordion({ title = "Test", findYourSon }: AccordionProps) {
         const newSons = sons.map((son) => (
           <Accordion 
             key={son.id}
-            title={`${son.id.toString().split("").join(".")} (${son.identificacao})`} 
+            plan={son}
             findYourSon={() => findChildrenOfPlans(son.id)} 
           />
         ))
@@ -47,22 +50,35 @@ export function Accordion({ title = "Test", findYourSon }: AccordionProps) {
   return (
     <div className={styles.accordion_container}>
     <div className={styles.accordion_container__box}>
-      <div className={styles.accordion_container__box__title_box}>
-        <h1>
-          {title} 
-          {isFetching && (<TailSpin color="#c70000" height={25} width={25} ariaLabel='Carregando' />) } 
-        </h1>
-        <button 
-          onClick={toogleAccordion} 
-          data-open={isOpen && "true"}
-          disabled={isFetching}
-        >
-          {
-            isOpen 
-            ? <FiChevronUp size={15} />
-            : <FiChevronDown size={15} />
-          }
-        </button>
+      <div className={styles.accordion_container__box__info_box}>
+        <div>
+          <span>
+            {plan.id.toString().split("").join(".")}
+            <label>CÓDIGO</label>
+          </span>
+          <span>
+            {plan.identificacao}
+            <label>IDENTIFICACÃO</label>
+          </span>
+          
+          <span>{plan.tipo}<label>TIPO</label></span>
+          <span>{format(new Date(plan.dataCadastro), 'dd/MM/yyyy')}<label>DATA DE CADASTRO</label></span>
+          <span>{plan.holding.nome}<label>HOLDING</label></span>
+        </div>
+        <div className={styles.accordion_container__box__info_box__button_box} >
+          {isFetching && (<TailSpin color="#c70000" height={20} width={20} ariaLabel='Carregando' />) } 
+          <button 
+            onClick={toogleAccordion} 
+            data-open={isOpen && "true"}
+            disabled={isFetching}
+          >
+            {
+              isOpen 
+              ? <FiChevronUp size={15} />
+              : <FiChevronDown size={15} />
+            }
+          </button>
+        </div>
       </div>
       {
         <AnimatePresence>
@@ -70,10 +86,12 @@ export function Accordion({ title = "Test", findYourSon }: AccordionProps) {
           isOpen && (
               <motion.div 
                 animate={{
-                  y: [-3, 0]
+                  x: [-20, 0],
+                  opacity: [0, 1]
                 }}
                 exit={{
-                  y: -3,
+                  x: [0, -20],
+                  opacity: [1, 0]
                 }}
                 className={styles.accordion_container__box__dropdown} >
                 {hisSon}

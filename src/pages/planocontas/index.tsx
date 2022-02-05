@@ -1,13 +1,20 @@
 import React from 'react';
 import { AnimateSharedLayout } from 'framer-motion';
+import { TailSpin } from 'react-loader-spinner';
 
 import styles from './styles.module.scss';
-import { Accordion } from '../../components/Accordion';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { api } from '../../services/api';
 
 import { AccountPlanDTO } from '../../dtos/AccountPLanDTO';
+import { FilterAccountPlansDataDTO } from '../../dtos/FilterAccountPlansDataDTO';
+
+import { Accordion } from '../../components/Accordion';
 import { PagesList } from '../../components/PageSelector/PagesList';
+import { FilterAccountPlans } from '../../components/FilterAccountPlans';
+
+import { fetchPlans, FetchPlansParams } from '../../utils/fetchPlans';
+import { findChildrenOfPlans } from '../../utils/findChildrensOfPlans';
 
 type PlansData = {
   data: AccountPlanDTO[]
@@ -18,30 +25,6 @@ interface PlanoContasProps {
   numberOfPages: number
 }
 
-export function findChildrenOfPlans(id: number) {
-  // const son = plans.data.find(plan => plan.parentPlanoConta?.id === id)
-  // // console.log(son)
-  // getPlans()
-  // const son2 = plans.data.filter(plan => plan.parentPlanoConta?.id === id)
-
-  return api.get(`/planocontas?nivelSuperior=${id}`).then((response) => {
-    const plans = response.data.data.filter(plan => plan.parentPlanoConta?.id === id)
-    return plans
-  })
-
-  // if (son2) {
-  //   return son2.map((son) => (
-  //     <Accordion 
-  //       key={son.id}
-  //       title={`${son.id.toString().split("").join(".")} (${son.identificacao})`} 
-  //       findYourSon={() => findChildrenOfPlans(son.id)} 
-  //     />
-  //   )) 
-  // }
-
-  // return null
-}
-
 export default function PlanoContas({ plans, numberOfPages }: PlanoContasProps) {
   
   const [listOfFatherPlans, setListOfFatherPlans] = React.useState<AccountPlanDTO[]>(plans.data.filter(plan => plan.parentPlanoConta === null))
@@ -49,13 +32,31 @@ export default function PlanoContas({ plans, numberOfPages }: PlanoContasProps) 
   const [pagesNumber, setPagesNumber] = React.useState(numberOfPages)
   const [currentPage, setCurrentPage] = React.useState(1)
 
+  const [isFetching, setIsFetching] = React.useState(false)
+
+  const [filterData, setFilterData] = React.useState<FetchPlansParams>(null)
+
   async function changePagination(page: number) {
     try {
+      setIsFetching(true)
       setCurrentPage(page)
-      const response = await api.get(`/planocontas?page=${page}`)
+      console.log(filterData)
+      const response = await fetchPlans(filterData ? {...filterData, page} : {page})
       const newPlans: PlansData = response.data
+
       setPagesNumber(Math.ceil(Number(response.headers['x-total-count'])/10))
-      setListOfFatherPlans(newPlans.data.filter(plan => plan.parentPlanoConta === null))
+
+      if (!filterData.identificacao) {
+        setListOfFatherPlans(
+          newPlans.data.filter(plan => plan.parentPlanoConta === null)
+        )
+      } else {
+        setListOfFatherPlans(newPlans.data)
+      } 
+
+      // setListOfFatherPlans(newPlans.data.filter(plan => plan.parentPlanoConta === null))
+
+      setIsFetching(false)
     } catch (error) {
       console.log(error)
       alert("Não foi possível realizar a paginação, tente novamente!")
@@ -63,20 +64,101 @@ export default function PlanoContas({ plans, numberOfPages }: PlanoContasProps) 
 
   }
 
+  async function clearFilter() {
+    try {
+
+      setIsFetching(true)
+      setFilterData(null)
+      setCurrentPage(1)
+  
+      const response = await fetchPlans({})
+      
+      setPagesNumber(Math.ceil(Number(response.headers['x-total-count'])/10))
+      setListOfFatherPlans(response.data.data.filter(plan => plan.parentPlanoConta === null))
+      setIsFetching(false)
+    } catch (error) {
+      console.log(error)
+      alert("Não foi possível limpar o filtro, tente novamente.")
+    }
+
+  }
+
+  async function fetchPlansByFilter({
+    identificacao,
+    tipo,
+    orderByDescending
+  }: FilterAccountPlansDataDTO) {
+    try {
+
+      orderByDescending = orderByDescending == "new" ? true : false
+      setIsFetching(true)
+      setFilterData({identificacao, tipo, orderByDescending})
+      setCurrentPage(1)
+
+      fetchPlans({
+        identificacao,
+        tipo,
+        orderByDescending
+      }).then((response) => {
+        setPagesNumber(Math.ceil(Number(response.headers['x-total-count'])/10))
+        
+        if (!identificacao) {
+          setListOfFatherPlans(
+            response.data.data.filter(plan => plan.parentPlanoConta === null)
+          )
+        } else {
+          setListOfFatherPlans(response.data.data)
+        } 
+        //aplicar lógica de listagem aqui
+        // componentes pais são os que possuem o id com menor length
+      }).finally(() => {
+        setIsFetching(false)
+      })
+
+    } catch (error) {
+      console.log(error)
+      alert("Não foi possível realizar a busca, verifique os campos e tente novamente!")
+    }
+  }
+
   return (
     <AnimateSharedLayout>
-      <div className={styles.challenge2__container}>
-        <div className={styles.challenge2__container__main}>
-          {/* <Accordion>
-           <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.</p>
-          </Accordion> */}
-          {listOfFatherPlans.map(plan => (
-            <Accordion 
-              key={plan.id} 
-              title={`${plan.id.toString().split("").join(".")} (${plan.identificacao})`}
-              findYourSon={() => findChildrenOfPlans(plan.id)}
-            />
-          ))}
+      <div className={styles.account_plans__container}>
+        <h1 className={styles.account_plans__container__module_title}>
+          PLANO GESTOR
+          <small className={styles.account_plans__container__module_title__company}>Oliveira {"&"} Rondelli</small>
+        </h1>
+        <div className={styles.account_plans__container__main}>
+          <h1 className={styles.account_plans__container__main__title}>
+            Plano Contas
+            {
+                isFetching && (
+                  <TailSpin color="#c70000" height={25} width={25} ariaLabel='Carregando' />
+                )
+              }
+          </h1>
+          <FilterAccountPlans 
+            clearFilter={clearFilter} 
+            fetchPlansByFilter={fetchPlansByFilter} 
+          />
+          <div className={styles.account_plans__container__main__accordions_box} >
+            {listOfFatherPlans[0] ? 
+              listOfFatherPlans.map(plan => (
+                <Accordion 
+                  key={plan.id}
+                  plan={plan}
+                  findYourSon={() => findChildrenOfPlans(plan.id)}
+                />
+              )) : (
+                <h1 
+                  className={styles.account_plans__container__main__accordions_box__not_found}
+                >
+                  PLANO CONTA NÃO ENCONTRADO.
+                </h1>
+              )
+            }
+            {}
+          </div>
 
           <PagesList
             changePagination={changePagination}
