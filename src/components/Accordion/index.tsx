@@ -22,14 +22,14 @@ export function Accordion({ plan, findYourSon }: AccordionProps) {
 
   const [isFetching, setIsFetching] = React.useState(false)
 
-  function toogleAccordion() {
+  React.useEffect(() => {
+    
+    async function findSons() {
 
-    setIsOpen(prev => !prev)
-
-    if (!isOpen) {
       setIsFetching(true)
-  
-      findYourSon().then(sons => {
+
+      await findChildrenOfPlans(plan.id)
+      .then((sons) => {
         const newSons = sons.map((son) => (
           <Accordion 
             key={son.id}
@@ -37,10 +37,36 @@ export function Accordion({ plan, findYourSon }: AccordionProps) {
             findYourSon={() => findChildrenOfPlans(son.id)} 
           />
         ))
-  
+
         setHisSon(newSons)
-      }).finally(() => setIsFetching(false))
+      }).finally(() => {
+        setIsOpen(true)
+        setIsFetching(false)
+      })
     }
+
+    findSons()
+  }, [])
+
+  function toogleAccordion() {
+
+    setIsOpen(prev => !prev)
+
+    // if (!isOpen) {
+    //   setIsFetching(true)
+  
+    //   findYourSon().then(sons => {
+    //     const newSons = sons.map((son) => (
+    //       <Accordion 
+    //         key={son.id}
+    //         plan={son}
+    //         findYourSon={() => findChildrenOfPlans(son.id)} 
+    //       />
+    //     ))
+  
+    //     setHisSon(newSons)
+    //   }).finally(() => setIsFetching(false))
+    // }
 
     // if (son) {
     //   setHisSon(son)
@@ -67,7 +93,7 @@ export function Accordion({ plan, findYourSon }: AccordionProps) {
         </div>
         <div className={styles.accordion_container__box__info_box__button_box} >
           {isFetching && (<TailSpin color="#c70000" height={20} width={20} ariaLabel='Carregando' />) } 
-          <button 
+          {/* <button 
             onClick={toogleAccordion} 
             data-open={isOpen && "true"}
             disabled={isFetching}
@@ -77,7 +103,7 @@ export function Accordion({ plan, findYourSon }: AccordionProps) {
               ? <FiChevronUp size={15} />
               : <FiChevronDown size={15} />
             }
-          </button>
+          </button> */}
         </div>
       </div>
       {
