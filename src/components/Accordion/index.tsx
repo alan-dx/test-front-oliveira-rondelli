@@ -12,10 +12,9 @@ import { AccountPlanDTO } from '../../dtos/AccountPLanDTO';
 interface AccordionProps {
   children?: ReactNode;
   plan: AccountPlanDTO;
-  findYourSon?: () => any;
 }
 
-export function Accordion({ plan, findYourSon }: AccordionProps) {
+export function Accordion({ plan }: AccordionProps) {
 
   const [isOpen, setIsOpen] = React.useState(false)
   const [hisSon, setHisSon] = React.useState(null)
@@ -34,7 +33,6 @@ export function Accordion({ plan, findYourSon }: AccordionProps) {
           <Accordion 
             key={son.id}
             plan={son}
-            findYourSon={() => findChildrenOfPlans(son.id)} 
           />
         ))
 

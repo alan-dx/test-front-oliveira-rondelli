@@ -26,7 +26,7 @@ export async function fetchPlans({
       identificacao,
       tipo,
       orderByDescending,
-      page
+      page,
     }
   })
   // }).then((response) => {

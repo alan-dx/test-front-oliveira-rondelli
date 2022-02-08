@@ -158,7 +158,6 @@ export default function PlanoContas({ plans, numberOfPages }: PlanoContasProps) 
                 <Accordion 
                   key={plan.id}
                   plan={plan}
-                  findYourSon={() => findChildrenOfPlans(plan.id)}
                 />
               )) : (
                 <h1 
